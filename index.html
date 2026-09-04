@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Signal Board</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0f1115;
+    color: #f2f4f8;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  header { padding: 16px 20px 8px; text-align: center; }
+  header h1 { font-size: 18px; margin: 0; font-weight: 600; opacity: .9; }
+  header p { font-size: 13px; margin: 4px 0 0; opacity: .55; }
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px;
+    align-content: start;
+  }
+  @media (min-width: 500px) { main { grid-template-columns: repeat(3, 1fr); } }
+  button.sound {
+    appearance: none;
+    border: 1px solid rgba(255,255,255,.08);
+    background: linear-gradient(180deg, #1c2029 0%, #14171e 100%);
+    color: inherit;
+    border-radius: 18px;
+    padding: 22px 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: transform .08s ease, background .2s ease;
+    min-height: 110px;
+  }
+  button.sound:active { transform: scale(0.96); background: #2a3140; }
+  button.sound .emoji { font-size: 40px; line-height: 1; }
+  button.sound.playing { background: #2d6cdf; border-color: #4c8dff; }
+  footer { padding: 12px 20px 20px; text-align: center; font-size: 11px; opacity: .4; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Tap to signal</h1>
+    <p id="subtitle">Loading…</p>
+  </header>
+  <main id="grid"></main>
+  <footer>Sound plays on your device only.</footer>
+
+<script>
+(async () => {
+  const grid = document.getElementById('grid');
+  const subtitle = document.getElementById('subtitle');
+  let manifest;
+  try {
+    const res = await fetch('sounds/manifest.json', { cache: 'no-cache' });
+    manifest = await res.json();
+  } catch (e) {
+    subtitle.textContent = 'Could not load sounds.';
+    return;
+  }
+  subtitle.textContent = manifest.subtitle || 'Pick one';
+
+  let current = null;
+  for (const item of manifest.sounds) {
+    const btn = document.createElement('button');
+    btn.className = 'sound';
+    btn.innerHTML = `<span class="emoji">${item.emoji || '🔊'}</span><span>${item.label}</span>`;
+    const audio = new Audio('sounds/' + item.file);
+    audio.preload = 'auto';
+    audio.addEventListener('ended', () => btn.classList.remove('playing'));
+    btn.addEventListener('click', () => {
+      if (current && current !== audio) { current.pause(); current.currentTime = 0; }
+      document.querySelectorAll('button.sound.playing').forEach(b => b.classList.remove('playing'));
+      audio.currentTime = 0;
+      audio.play().then(() => btn.classList.add('playing')).catch(() => {});
+      current = audio;
+      if (navigator.vibrate) navigator.vibrate(15);
+    });
+    grid.appendChild(btn);
+  }
+})();
+</script>
+</body>
+</html>

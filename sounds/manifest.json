@@ -1,0 +1,13 @@
+{
+  "subtitle": "Signal me a question",
+  "sounds": [
+    { "label": "Cow",     "emoji": "🐄", "file": "cow.mp3" },
+    { "label": "Sheep",   "emoji": "🐑", "file": "sheep.mp3" },
+    { "label": "Goat",    "emoji": "🐐", "file": "goat.mp3" },
+    { "label": "Horse",   "emoji": "🐴", "file": "horse.mp3" },
+    { "label": "Rooster", "emoji": "🐓", "file": "rooster.mp3" },
+    { "label": "Chicken", "emoji": "🐔", "file": "chicken.mp3" },
+    { "label": "Dog",     "emoji": "🐕", "file": "dog.mp3" },
+    { "label": "Cat",     "emoji": "🐈", "file": "cat.mp3" }
+  ]
+}
